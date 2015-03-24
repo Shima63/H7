@@ -1,10 +1,10 @@
 /*
- * H6 Program
- * Re-doing of Homework 5 for Understanding Basic Concepts about Software Design.
+ * H7 Program
+ * Use of Classes and Their Associate Concepts of Scope, Privacy and Encapsulation.
  * By Shima Azizzadeh-Roodpish
- * 18 March 2015
+ * 23 March 2015
  * No Copyright
- * Github account: https://github.com/Shima63/H6.git
+ * Github account: https://github.com/Shima63/H7.git
  */
  
 // External Libraries
@@ -20,6 +20,11 @@
 #include <locale>
 using namespace std;
 
+// Defined Libraries
+
+#include "earthquake.h"
+#include "print.h"
+
 // Global Variables
 
 string inputfilename, outputfilename = "shima.out", logfilename = "shima.log", message;
@@ -27,20 +32,7 @@ int flag;
 
 // Defining Struct
 
-struct earthquake {
-    string Event_ID;
-    string date;
-    string time;
-    string time_zone;
-    string earthquake_name;
-    string longitude;
-    string latitude;
-    string depth;
-    string magnitude_type_string;
-    float magnitude_size;
-};
-
-struct entry {
+struct station {
     string network_code;
     string station_code;
     string type_of_band;
@@ -74,8 +66,8 @@ enum instrument_type {
     highgain, lowgain, accelerometer
 };
      
-entry entry_array [ 300 ];
-entry entry_temp;
+station entry_array [ 300 ];
+station entry_temp;
 earthquake header;
 
 
@@ -85,23 +77,11 @@ earthquake header;
 
 void open_input ( ifstream & );
 void open_file ( string, ofstream & );
-void print_file ( string, ofstream & );
-void print_file ( int, ofstream & );
-void check_date ( string, ofstream & );
-void check_month ( int, ofstream & );
-void check_day ( int, ofstream & );
-void check_year ( int, ofstream & );
-void check_time ( string, ofstream & );
-void check_time_zone ( string, ofstream & );
-void check_magnitude_type ( string, ofstream & );
-void check_magnitude_size ( float, ofstream & );
 void produce_signal ( ofstream &, string, string, string, string, string, string );
 void check_network_code ( int, string, ofstream & );
 void check_station_code ( int, string, ofstream & );
 void check_type_of_band ( int, string , ofstream & );
 void check_type_of_instrument ( int, string, ofstream & );
-string monthstring ( months );
-string uppercase ( string );
 string magnitude_type_to_string ( magnitude_type );
 magnitude_type string_to_magnitude_type ( string );
 string network_code_to_string ( network_code );
@@ -110,30 +90,6 @@ string band_type_to_string ( band_type );
 band_type string_to_band_type ( string );
 string instrument_type_to_string ( instrument_type );
 instrument_type string_to_instrument_type ( string );
-
-// Set and Get Functions
-
-void set_Event_ID ( string, earthquake & );
-string get_Event_ID ();
-string set_date ( string, earthquake &, ofstream & );
-string get_date ();
-void set_time ( string, earthquake &, ofstream & );
-string get_time ();
-string get_date ();
-void set_time_zone ( string, earthquake &, ofstream & );
-string get_time_zone ();
-void set_earthquake_name ( string, earthquake & );
-string get_earthquake_name ();
-void set_latitude ( string, earthquake & );
-string get_latitude ();
-void set_longitude ( string, earthquake & );
-string get_longitude ();
-void set_depth ( string, earthquake & );
-string get_depth ();
-void set_magnitude_type_string ( string, earthquake &, ofstream & );
-string get_magnitude_type_string ();
-void set_magnitude_size ( float, earthquake &, ofstream & );
-float get_magnitude_size ();
 
 // ********************************************************************************************************************
 
@@ -161,44 +117,44 @@ int main () {
     open_file ( logfilename, logfile );
     
     message = "Opening file: shima.in";
-    print_file ( message, logfile );
-    print_file ( "\n", logfile );
+    print :: print_file ( message, logfile );
+    print :: print_file ( "\n", logfile );
     message = "Processing input ...";
-    print_file ( message, logfile );
-    print_file ( "\n", logfile );
+    print :: print_file ( message, logfile );
+    print :: print_file ( "\n", logfile );
     
     // Reading and Checking Header
         
     inputfile >> Event_ID;
-    set_Event_ID ( Event_ID, header );
+    earthquake :: set_Event_ID ( Event_ID, header );
     inputfile >> date;
-    month = set_date ( date, header, logfile );
-    date = get_date ();
+    month = earthquake :: set_date ( date, header, logfile );
+    date = earthquake :: get_date ();
             
     inputfile >> time;
-    set_time ( time, header, logfile );
+    earthquake :: set_time ( time, header, logfile );
     inputfile >> time_zone;
-    set_time_zone ( time_zone, header, logfile );    
+    earthquake :: set_time_zone ( time_zone, header, logfile );    
     inputfile >> earthquake_name;
     getline(inputfile, earthquake_name_continue);
     earthquake_name.append ( earthquake_name_continue ); 
-    set_earthquake_name ( earthquake_name, header);
+    earthquake :: set_earthquake_name ( earthquake_name, header);
     
     // Epicenter Location
     
     inputfile >> longitude;
-    set_longitude ( longitude, header);
+    earthquake :: set_longitude ( longitude, header);
     inputfile >> latitude;
-    set_latitude ( latitude, header);
+    earthquake :: set_latitude ( latitude, header);
     inputfile >> depth;
-    set_depth ( depth, header);
+    earthquake :: set_depth ( depth, header);
         
     // Magnitude Information
     
     inputfile >> magnitude_type_string;
-    set_magnitude_type_string ( magnitude_type_string, header, logfile );
+    earthquake :: set_magnitude_type_string ( magnitude_type_string, header, logfile );
     inputfile >> magnitude_size;
-    set_magnitude_size ( magnitude_size, header, logfile );
+    earthquake :: set_magnitude_size ( magnitude_size, header, logfile );
 
     message = "Header read correctly!";
     print_file ( message, logfile );
@@ -378,222 +334,6 @@ void open_file ( string filename, ofstream & ofs ) {
     }
     return;
 } 
-
-// This "print_file" function Prints Messages on Files and Terminal. Message Is of String Type.
-
-void print_file ( string message, ofstream & ofs ) {
-    ofs << message << flush;
-    cout << message << flush;
-    return;
-}
-
-// This "print_file" function Prints numbers on Files and Terminal. Number Is of Int Type.
-
-void print_file ( int number, ofstream & ofs ) {
-    ofs << number << flush;
-    cout << number << flush;
-    return;
-}
-
-// This "check_date" function checks the validity of date entry.
-
-void check_date ( string date, ofstream & logfile ) {
-    message = "Date format is not right.";
-    if ( date.length() != 10 ) {
-        print_file ( message, logfile );
-        exit (EXIT_FAILURE);
-    }
-    else {
-        if ( ( ( date[2] != "-"[0] ) && ( date[2] != "/"[0] ) ) || ( ( date[5] != "-"[0] ) && ( date[5] != "/"[0] ) ) ) {
-            print_file ( message, logfile );
-            exit (EXIT_FAILURE);
-        }
-        else {
-            if ( ( !isdigit ( date[0] ) ) || ( !isdigit ( date[1] ) ) || ( !isdigit ( date[3] ) ) || ( !isdigit ( date[4] ) ) ) {
-                print_file ( message, logfile );
-                exit (EXIT_FAILURE);
-            }  
-            if ( ( !isdigit ( date[6] ) ) || ( !isdigit ( date[7] ) ) || ( !isdigit ( date[8] ) ) || ( !isdigit ( date[9] ) ) ) {
-                print_file ( message, logfile );
-                exit (EXIT_FAILURE);
-            }
-        }
-    }
-    return;
-}    
-
-// This "check_month" function checks the validity of month entry.
-
-void check_month ( int month, ofstream & logfile ) {
-    if ( ( month > 12 ) || ( month < 1 ) ) {
-        message = "Month format is not right.";
-        print_file ( message, logfile );
-        exit (EXIT_FAILURE);
-    }
-    return;
-}
-
-// This "check_day" function checks the validity of day entry.
-
-void check_day ( int day, ofstream & logfile ) {
-    if ( ( day > 31 ) || ( day < 1 ) ) {
-        message = "Day is not right.";
-        print_file ( message, logfile );
-        exit (EXIT_FAILURE);
-    }
-    return;
-}
-
-// This "check_year" function checks the validity of year entry.
-
-void check_year ( int year, ofstream & logfile ) {
-    if ( year < 0 ) {
-        message = "Year is not right.";
-        print_file ( message, logfile );
-        exit (EXIT_FAILURE);
-    }
-    return;
-}
-
-// This "check_time" function checks the validity of time entry.
-
-void check_time ( string time, ofstream & logfile ) {
-    message = "Time format is not right.";
-    if ( time.length() != 12 ) {
-        print_file ( message, logfile );
-        exit (EXIT_FAILURE);
-    }
-    else {
-        if ( ( time[2] != ":"[0] ) || ( time[5] != ":"[0] ) || ( time[8] != "."[0] ) ) {
-            print_file ( message, logfile );
-            exit (EXIT_FAILURE);
-        }
-        else {
-        if ( ( !isdigit ( time[0] ) ) || ( !isdigit ( time[1] ) ) || ( !isdigit ( time[3] ) ) || ( !isdigit ( time[4] ) ) ) {
-            print_file ( message, logfile );
-            exit (EXIT_FAILURE);
-        }  
-        if ( ( !isdigit ( time[6] ) ) || ( !isdigit ( time[7] ) ) || ( !isdigit ( time[9] ) ) 
-        || ( !isdigit ( time[10] ) ) || ( !isdigit ( time[11] ) ) ) {
-            print_file ( message, logfile );
-            exit (EXIT_FAILURE);
-        }
-        
-        // Defining Temporary Variables
-        
-        string temp0, temp1, temp2;
-        double value;
-        
-        // Finding and Checking  Validity of the Hour
-  
-        temp0 =  temp0.append ( time.begin (), time.begin () + 2 );
-        value = atoi(temp0.c_str());
-        if ( ( value < 0 ) || ( value > 23 ) ) {
-            message = "Hour is not right.";
-            print_file ( message, logfile );
-            exit (EXIT_FAILURE);
-        }
-        
-        // Finding and Checking  Validity of the Minute
-  
-        temp1 =  temp1.append ( time.begin () + 3, time.begin () + 5 );
-        value = atoi(temp1.c_str());
-        if ( ( value < 0 ) || ( value > 59 ) ) {
-            message = "Minute is not right.";
-            print_file ( message, logfile );
-            exit (EXIT_FAILURE);
-        }
-        
-        // Finding and Checking  Validity of the Second
-  
-        temp2 =  temp2.append ( time.begin () + 6, time.begin () + 8 );
-        value = atoi(temp2.c_str());
-        if ( ( value < 0 ) || ( value > 59 ) ) {
-            message = "Second is not right.";
-            print_file ( message, logfile );
-            exit (EXIT_FAILURE);
-        }                    
-    }
-    }
-    return;
-}    
-
-// This "check_time_zone" function checks the validity of time zone entry.
-
-void check_time_zone ( string time_zone, ofstream & logfile ) {
-    message = "Time_zone format is not right.";
-    if ( ( time_zone.length() != 3 ) || ( !isalpha ( time_zone[0] ) ) || ( !isalpha ( time_zone[1] ) ) || ( !isalpha ( time_zone[2] ) ) ) {
-        print_file ( message, logfile );
-        exit (EXIT_FAILURE);
-    }
-    
-    return;
-}    
-
-// This "check_magnitude_type" function checks the validity of magnitude type considering it case insensitive.
-
-void check_magnitude_type ( string magnitude_type, ofstream & logfile ) {
-    message = "magnitude_type is not right.";
-    string mt = uppercase ( magnitude_type );
-    if ( ( mt != uppercase ( "ml" ) ) && ( mt != uppercase ( "ms" ) ) && ( mt != uppercase ( "mb" ) ) && ( mt != uppercase ( "mw" ) ) ) {
-        print_file ( message, logfile );
-        exit (EXIT_FAILURE);
-    }
-    return;
-}
-
-// This "check_magnitude_size" function checks the validity of magnitude size as a positive real number (>0).
-
-void check_magnitude_size ( float magnitude_size, ofstream & logfile ) {
-    message = "magnitude_size is not right.";
-    if ( magnitude_size <= 0 ) {
-        print_file ( message, logfile );
-        exit (EXIT_FAILURE);
-    }
-    return;
-}
-
-// This "string uppercase" function changes all the letters of the input string to upper case. ( For string )
-
-string uppercase ( string s ) {
-    string result = s;
-    for (int i=0; i < (int)s.size(); i++)
-        result[i] = toupper(s[i]);
-    return result;
-}
-
-// Function to Convert from "month" to a String...
-
-string monthstring ( months month ) {
-    switch ( month ) {
-        case January:
-            return "January";
-        case February:
-            return "February";
-        case March:
-            return "March";
-        case April:
-            return "April";
-        case May:
-            return "May";
-        case June:
-            return "June";
-        case July:
-            return "July";
-        case August:
-            return "August";
-        case September:
-            return "September";
-        case October:
-            return "October";
-        case November:
-            return "November";
-        case December:
-            return "December";
-        default:
-            return "ILLEGAL";
-    }
-}    
 
 // Function to Produce Signal Name as an String
         
@@ -827,133 +567,9 @@ instrument_type string_to_instrument_type (string NN) {
 }
 
 // ***********************************************************************************
+
 // Set and Get Functions
 
-// Set and Get Functions For Earthquake Struct
 
-void set_Event_ID ( string s, earthquake & header ) {
-    header.Event_ID = s;
-    return;
-}
-
-string get_Event_ID () {
-    return header.Event_ID;
-}      
-
-string set_date ( string s, earthquake & header, ofstream & logfile ) {
-
-    // Variables
-    
-    int value;
-    string tempa, tempb, tempc, month;
-    months month_name;
-    
-    header.date = s;
-    check_date ( header.date, logfile );
-    
-    // Finding and Checking  Validity of the Month
-    
-    tempa =  tempa.append ( header.date.begin (), header.date.begin () + 2 );
-    value = atoi(tempa.c_str());
-    check_month ( value, logfile );
-    month_name = months(value);
-    month = monthstring ( month_name );
-    cout << month <<endl;
-
-    // Finding and Checking  Validity of the day
-  
-    tempb =  tempb.append ( header.date.begin () + 4, header.date.begin () + 5 );
-    value = atoi(tempb.c_str());
-    check_day ( value, logfile );
-    
-    // Finding and Checking  Validity of the year
-  
-    tempc =  tempc.append ( header.date.begin () + 6, header.date.end () );
-    value = atoi(tempc.c_str());
-    check_year ( value, logfile );
-    
-    return month;
-}
-
-string get_date () {
-    return header.date;
-}
-
-void set_time ( string s, earthquake & header, ofstream & logfile ) {
-    header.time = s;
-    check_time ( header.time, logfile );
-    return;
-}
-
-string get_time () {
-    return header.time;
-}
-
-void set_time_zone ( string s, earthquake & header, ofstream & logfile ) {
-    header.time_zone = s;
-    check_time_zone ( header.time_zone, logfile );
-    return;
-}
-
-string get_time_zone () {
-    return header.time_zone;
-}
-
-void set_earthquake_name ( string s, earthquake & header ) {
-    header.earthquake_name = s;
-    return;
-}
-
-string get_earthquake_name () {
-    return header.earthquake_name;
-}
-
-void set_latitude ( string s, earthquake & header ) {
-    header.latitude = s;
-    return;
-}
-
-string get_latitude () {
-    return header.latitude;
-} 
-
-void set_longitude ( string s, earthquake & header ) {
-    header.longitude = s;
-    return;
-}
-
-string get_longitude () {
-    return header.longitude;
-} 
-
-void set_depth ( string s, earthquake & header ) {
-    header.depth = s;
-    return;
-}
-
-string get_depth () {
-    return header.depth;
-}
-
-void set_magnitude_type_string ( string s, earthquake & header, ofstream & logfile ) {
-    header.magnitude_type_string = s;
-    check_magnitude_type ( header.magnitude_type_string, logfile );
-    return;
-}
-
-string get_magnitude_type_string () {
-    return header.magnitude_type_string;
-}
-
-void set_magnitude_size ( float s, earthquake & header, ofstream & logfile ) {
-    header.magnitude_size = s;
-    check_magnitude_size ( header.magnitude_size, logfile );
-    return;
-}
-
-float get_magnitude_size () {
-    return header.magnitude_size;
-}
-
-// Set and Get Functions For Entry Struct
+// Set and Get Functions For Station Struct
              
