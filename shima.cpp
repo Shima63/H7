@@ -27,7 +27,7 @@ using namespace std;
 
 // Global Variables
 
-string inputfilename, outputfilename = "shima.out", logfilename = "shima.log", message;
+string inputfilename, outputfilename = "shima.out", logfilename = "shima.log";
 int flag;
 
 // Defining Struct
@@ -41,14 +41,6 @@ struct station {
 };    
     
 // Defining Enumerators
-    
-// Start the Enumeration from 1 to Facilitate Printing...
-// Since Months Are Numbered Starting at 1
-
-enum months { 
-    January = 1, February, March, April, May, June,
-    July, August, September, October, November, December
-}; 
 
 enum magnitude_type {
     ML, Ms, Mb, Mw
@@ -68,8 +60,6 @@ enum instrument_type {
      
 station entry_array [ 300 ];
 station entry_temp;
-earthquake header;
-
 
 // ********************************************************************************************************************
 
@@ -100,6 +90,8 @@ int main () {
 
     // Defining Variables' Type
     
+    earthquake header;
+    
     string Event_ID, date, time, time_zone, earthquake_name, latitude, longitude, depth, magnitude_type_string;
     string earthquake_name_continue, day, month, year;
     string temp1, temp2, temp3;
@@ -117,44 +109,44 @@ int main () {
     open_file ( logfilename, logfile );
     
     message = "Opening file: shima.in";
-    print :: print_file ( message, logfile );
-    print :: print_file ( "\n", logfile );
+    print_file ( message, logfile );
+    print_file ( "\n", logfile );
     message = "Processing input ...";
-    print :: print_file ( message, logfile );
-    print :: print_file ( "\n", logfile );
+    print_file ( message, logfile );
+    print_file ( "\n", logfile );
     
     // Reading and Checking Header
         
     inputfile >> Event_ID;
-    earthquake :: set_Event_ID ( Event_ID, header );
+    header.set_Event_ID ( Event_ID );
     inputfile >> date;
-    month = earthquake :: set_date ( date, header, logfile );
-    date = earthquake :: get_date ();
+    month = header.set_date ( date, logfile );
+    date = header.get_date ();
             
     inputfile >> time;
-    earthquake :: set_time ( time, header, logfile );
+    header.set_time ( time, logfile );
     inputfile >> time_zone;
-    earthquake :: set_time_zone ( time_zone, header, logfile );    
+    header.set_time_zone ( time_zone, logfile );    
     inputfile >> earthquake_name;
     getline(inputfile, earthquake_name_continue);
     earthquake_name.append ( earthquake_name_continue ); 
-    earthquake :: set_earthquake_name ( earthquake_name, header);
+    header.set_earthquake_name ( earthquake_name );
     
     // Epicenter Location
     
     inputfile >> longitude;
-    earthquake :: set_longitude ( longitude, header);
+    header.set_longitude ( longitude );
     inputfile >> latitude;
-    earthquake :: set_latitude ( latitude, header);
+    header.set_latitude ( latitude );
     inputfile >> depth;
-    earthquake :: set_depth ( depth, header);
+    header.set_depth ( depth );
         
     // Magnitude Information
     
     inputfile >> magnitude_type_string;
-    earthquake :: set_magnitude_type_string ( magnitude_type_string, header, logfile );
+    header.set_magnitude_type_string ( magnitude_type_string, logfile );
     inputfile >> magnitude_size;
-    earthquake :: set_magnitude_size ( magnitude_size, header, logfile );
+    header.set_magnitude_size ( magnitude_size, logfile );
 
     message = "Header read correctly!";
     print_file ( message, logfile );
@@ -167,9 +159,11 @@ int main () {
     
     outputfile << "# " << day.append( date.begin () + 3, date.begin () + 5 ) << " " << month << " " 
     << year.append( date.begin () + 6, date.end () );
-    outputfile << " " << get_time () << " " <<  get_time_zone () << " " << magnitude_type_to_string ( string_to_magnitude_type ( get_magnitude_type_string () ) ) 
-    << " " << get_magnitude_size () << " " << get_earthquake_name () << " ";
-    outputfile << "[" << get_Event_ID () << "]  (" << get_longitude () << ", " << get_latitude () << ", " << get_depth () << ")" << endl;
+    outputfile << " " << header.get_time () << " " <<  header.get_time_zone () << " " << 
+    magnitude_type_to_string ( string_to_magnitude_type ( header.get_magnitude_type_string () ) ) 
+    << " " << header.get_magnitude_size () << " " << header.get_earthquake_name () << " ";
+    outputfile << "[" << header.get_Event_ID () << "]  (" << header.get_longitude () << ", " 
+    << header.get_latitude () << ", " << header.get_depth () << ")" << endl;
 
     // Reading Entries
 
@@ -280,7 +274,7 @@ int main () {
         
         // Producing Signal
         
-        produce_signal ( outputfile, get_Event_ID (), network_code_to_string ( string_to_network_code ( entry_array[i].network_code ) ), 
+        produce_signal ( outputfile, header.get_Event_ID (), network_code_to_string ( string_to_network_code ( entry_array[i].network_code ) ), 
         entry_array[i].station_code, band_type_to_string ( string_to_band_type ( entry_array[i].type_of_band ) ), 
         instrument_type_to_string ( string_to_instrument_type ( entry_array[i].type_of_instrument ) ), entry_array[i].orientation );    
     }
@@ -567,9 +561,6 @@ instrument_type string_to_instrument_type (string NN) {
 }
 
 // ***********************************************************************************
-
-// Set and Get Functions
-
 
 // Set and Get Functions For Station Struct
              
