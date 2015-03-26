@@ -29,6 +29,7 @@ using namespace std;
 
 string inputfilename, outputfilename = "shima.out", logfilename = "shima.log";
 int flag;
+string mymessage;
 
 // Defining Struct
 
@@ -81,6 +82,12 @@ band_type string_to_band_type ( string );
 string instrument_type_to_string ( instrument_type );
 instrument_type string_to_instrument_type ( string );
 
+
+// Set and Get Functions
+
+// void set_network_code ( string, earthquake & );
+// string get_network_code ();
+
 // ********************************************************************************************************************
 
 // Main Program.
@@ -108,11 +115,9 @@ int main () {
     ofstream logfile;
     open_file ( logfilename, logfile );
     
-    message = "Opening file: shima.in";
-    print_file ( message, logfile );
+    print_file ( "Opening file: shima.in", logfile );
     print_file ( "\n", logfile );
-    message = "Processing input ...";
-    print_file ( message, logfile );
+    print_file ( "Processing input ...", logfile );
     print_file ( "\n", logfile );
     
     // Reading and Checking Header
@@ -148,8 +153,8 @@ int main () {
     inputfile >> magnitude_size;
     header.set_magnitude_size ( magnitude_size, logfile );
 
-    message = "Header read correctly!";
-    print_file ( message, logfile );
+    mymessage = "Header read correctly!";
+    print_file ( mymessage, logfile );
     print_file ( "\n\n", logfile );
 
     // Preparing output file
@@ -300,13 +305,13 @@ void open_input ( ifstream & ifs ) {
     // Check to Make Sure the File Is Opened Properly
 
     if ( !ifs.is_open() ) {
-        message = "Input file does not exist!";
+        mymessage = "Input file does not exist!";
         
         // Making log file When There Is Error
 
         ofstream logfile;
         open_file ( logfilename, logfile );
-        print_file ( message, logfile );
+        print_file ( mymessage, logfile );
         exit (EXIT_FAILURE);
     }   
     return;
@@ -317,13 +322,13 @@ void open_input ( ifstream & ifs ) {
 void open_file ( string filename, ofstream & ofs ) {
     ofs.open(filename.c_str());
     if ( !ofs.is_open() ) {
-        message = "File does not exist!";
+        mymessage = "File does not exist!";
             
         // Making log file When There Is Error
 
         ofstream logfile;
         open_file ( logfilename, logfile );
-        print_file ( message, logfile );
+        print_file ( mymessage, logfile );
         exit (EXIT_FAILURE);
     }
     return;

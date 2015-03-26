@@ -12,4 +12,4 @@ H7: shima.cpp
 	$(CC) $(CFLAGS) print.cpp earthquake.cpp shima.cpp -o shima 
 
 clean:
-	rm -rf H7​
+	rm -rf shima​

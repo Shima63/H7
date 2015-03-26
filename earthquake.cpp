@@ -1,8 +1,9 @@
 #include <iostream>
 #include "earthquake.h"
 #include "print.h"
-
 using namespace std;
+
+string message;
 
 // Set and Get Functions For Earthquake Struct
 
@@ -33,7 +34,6 @@ string earthquake :: set_date ( string s, ofstream & logfile ) {
     check_month ( value, logfile );
     month_name = months(value);
     month = monthstring ( month_name );
-    cout << month <<endl;
     
     // Finding and Checking  Validity of the day
     
