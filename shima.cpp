@@ -91,6 +91,8 @@ void set_station_code ( int, string, station &, ofstream & );
 string get_station_code ();
 void set_type_of_band ( int, string, station &, ofstream & );
 string get_type_of_band ();
+void set_type_of_instrument ( int, string, station &, ofstream & );
+string get_type_of_instrument ();
 
 // ********************************************************************************************************************
 
@@ -106,7 +108,7 @@ int main () {
     string Event_ID, date, time, time_zone, earthquake_name, latitude, longitude, depth, magnitude_type_string;
     string earthquake_name_continue, day, month, year;
     string temp1, temp2, temp3;
-    string temp_network_code, temp_station_code, temp_type_of_band;
+    string temp_network_code, temp_station_code, temp_type_of_band, temp_type_of_instrument;
     int num_of_valid_entries = 0, num_of_input = 0, num_of_signal = 0;
     float magnitude_size;
     
@@ -191,9 +193,10 @@ int main () {
         inputfile >> temp_type_of_band;
         set_type_of_band ( num_of_input, temp_type_of_band, entry_temp, logfile);
         temp_type_of_band = get_type_of_band ();
-        inputfile >> entry_temp.type_of_instrument;        
-        check_type_of_instrument ( num_of_input, entry_temp.type_of_instrument, logfile );
-
+        inputfile >> temp_type_of_instrument;        
+        set_type_of_instrument ( num_of_input, temp_type_of_instrument, entry_temp, logfile);
+        temp_type_of_instrument = get_type_of_instrument ();
+       
        // Checking Orientation
         
         temp1 = "";
@@ -619,4 +622,16 @@ string get_type_of_band () {
     return  entry_temp.type_of_band;
 }
         
-               
+// Function set_type_of_instrument
+        
+void set_type_of_instrument (  int num_of_input, string temp_type_of_instrument, station & entry_temp, ofstream & logfile) {               
+    check_type_of_instrument ( num_of_input, temp_type_of_instrument, logfile );
+    entry_temp.type_of_instrument = temp_type_of_instrument;
+    return;
+}
+        
+// Function get_type_of_instrument
+        
+string get_type_of_instrument () {
+    return  entry_temp.type_of_instrument;
+}               
