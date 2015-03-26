@@ -85,8 +85,8 @@ instrument_type string_to_instrument_type ( string );
 
 // Set and Get Functions
 
-// void set_network_code ( string, earthquake & );
-// string get_network_code ();
+void set_network_code ( int, string, station &, ofstream & );
+string get_network_code ();
 
 // ********************************************************************************************************************
 
@@ -102,6 +102,7 @@ int main () {
     string Event_ID, date, time, time_zone, earthquake_name, latitude, longitude, depth, magnitude_type_string;
     string earthquake_name_continue, day, month, year;
     string temp1, temp2, temp3;
+    string temp_network_code;
     int num_of_valid_entries = 0, num_of_input = 0, num_of_signal = 0;
     float magnitude_size;
     
@@ -172,13 +173,14 @@ int main () {
 
     // Reading Entries
 
-    while ( ( inputfile >> entry_temp.network_code ) && ( num_of_valid_entries < 300 ) ) {
+    while ( ( inputfile >> temp_network_code ) && ( num_of_valid_entries < 300 ) ) {
         flag = 0;
         num_of_input = num_of_input + 1;
         
         // Checking
             
-        check_network_code ( num_of_input, entry_temp.network_code, logfile );
+        set_network_code (  num_of_input, temp_network_code, entry_temp, logfile);
+        temp_network_code = get_network_code ();
         inputfile >> entry_temp.station_code;         
         check_station_code ( num_of_input, entry_temp.station_code, logfile );
         inputfile >> entry_temp.type_of_band;        
@@ -568,4 +570,19 @@ instrument_type string_to_instrument_type (string NN) {
 // ***********************************************************************************
 
 // Set and Get Functions For Station Struct
+
+// Function set_network_code
+        
+void set_network_code (  int num_of_input, string temp_network_code, station & entry_temp, ofstream & logfile) {
+    check_network_code ( num_of_input, temp_network_code, logfile );
+    entry_temp.network_code = temp_network_code;
+    return;
+}
+        
+// Function get_network_code
+        
+string get_network_code () {
+    return  entry_temp.network_code;
+}                
+  
              
