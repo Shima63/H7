@@ -87,6 +87,8 @@ instrument_type string_to_instrument_type ( string );
 
 void set_network_code ( int, string, station &, ofstream & );
 string get_network_code ();
+void set_station_code ( int, string, station &, ofstream & );
+string get_station_code ();
 
 // ********************************************************************************************************************
 
@@ -102,7 +104,7 @@ int main () {
     string Event_ID, date, time, time_zone, earthquake_name, latitude, longitude, depth, magnitude_type_string;
     string earthquake_name_continue, day, month, year;
     string temp1, temp2, temp3;
-    string temp_network_code;
+    string temp_network_code, temp_station_code;
     int num_of_valid_entries = 0, num_of_input = 0, num_of_signal = 0;
     float magnitude_size;
     
@@ -181,8 +183,9 @@ int main () {
             
         set_network_code (  num_of_input, temp_network_code, entry_temp, logfile);
         temp_network_code = get_network_code ();
-        inputfile >> entry_temp.station_code;         
-        check_station_code ( num_of_input, entry_temp.station_code, logfile );
+        inputfile >> temp_station_code;
+        set_station_code (  num_of_input, temp_station_code, entry_temp, logfile);
+        temp_station_code = get_station_code ();              
         inputfile >> entry_temp.type_of_band;        
         check_type_of_band ( num_of_input, entry_temp.type_of_band, logfile );
         inputfile >> entry_temp.type_of_instrument;        
@@ -583,6 +586,19 @@ void set_network_code (  int num_of_input, string temp_network_code, station & e
         
 string get_network_code () {
     return  entry_temp.network_code;
-}                
-  
+}
+                
+// Function set_station_code
+        
+void set_station_code (  int num_of_input, string temp_station_code, station & entry_temp, ofstream & logfile) {               
+    check_station_code ( num_of_input, temp_station_code, logfile );
+    entry_temp.station_code = temp_station_code;
+    return;
+}
+        
+// Function get_station_code
+        
+string get_station_code () {
+    return  entry_temp.station_code;
+}
              
