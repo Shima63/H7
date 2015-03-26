@@ -28,7 +28,7 @@ using namespace std;
 // Global Variables
 
 string inputfilename, outputfilename = "shima.out", logfilename = "shima.log";
-int flag;
+int flag, num_of_valid_entries = 0, num_of_input = 0, num_of_signal = 0;
 string mymessage;
 
 // Defining Struct
@@ -93,6 +93,8 @@ void set_type_of_band ( int, string, station &, ofstream & );
 string get_type_of_band ();
 void set_type_of_instrument ( int, string, station &, ofstream & );
 string get_type_of_instrument ();
+void set_orientation ( int, int, string, station &, station &, ofstream & );
+string get_orientation ();
 
 // ********************************************************************************************************************
 
@@ -107,9 +109,7 @@ int main () {
     
     string Event_ID, date, time, time_zone, earthquake_name, latitude, longitude, depth, magnitude_type_string;
     string earthquake_name_continue, day, month, year;
-    string temp1, temp2, temp3;
-    string temp_network_code, temp_station_code, temp_type_of_band, temp_type_of_instrument;
-    int num_of_valid_entries = 0, num_of_input = 0, num_of_signal = 0;
+    string temp_network_code, temp_station_code, temp_type_of_band, temp_type_of_instrument, temp_orientation;
     float magnitude_size;
     
     // Prompt User for Input File Name.
@@ -183,93 +183,22 @@ int main () {
         flag = 0;
         num_of_input = num_of_input + 1;
         
-        // Checking
+        // Checking Using Set and Get Functions for Station
             
-        set_network_code ( num_of_input, temp_network_code, entry_temp, logfile);
+        set_network_code ( num_of_input, temp_network_code, entry_temp, logfile );
         temp_network_code = get_network_code ();
         inputfile >> temp_station_code;
-        set_station_code ( num_of_input, temp_station_code, entry_temp, logfile);
+        set_station_code ( num_of_input, temp_station_code, entry_temp, logfile );
         temp_station_code = get_station_code ();              
         inputfile >> temp_type_of_band;
-        set_type_of_band ( num_of_input, temp_type_of_band, entry_temp, logfile);
+        set_type_of_band ( num_of_input, temp_type_of_band, entry_temp, logfile );
         temp_type_of_band = get_type_of_band ();
         inputfile >> temp_type_of_instrument;        
-        set_type_of_instrument ( num_of_input, temp_type_of_instrument, entry_temp, logfile);
+        set_type_of_instrument ( num_of_input, temp_type_of_instrument, entry_temp, logfile );
         temp_type_of_instrument = get_type_of_instrument ();
-       
-       // Checking Orientation
-        
-        temp1 = "";
-        temp2 = "";
-        temp3 = "";
-        inputfile >> entry_temp.orientation;        
-        if ( ( entry_temp.orientation.length() < 1 ) ||  ( entry_temp.orientation.length() > 3 ) ) {
-            flag = 5;
-        }
-        else {
-            temp1 = entry_temp.orientation[0];
-            if ( ( temp1 != "1" ) && ( temp1 != "2" ) && ( temp1 != "3" ) ) {
-                if ( ( uppercase ( temp1 ) != uppercase ( "N" ) ) && ( uppercase ( temp1 ) != uppercase ( "E" ) ) 
-                && ( uppercase ( temp1 ) != uppercase ( "Z" ) ) ) { 
-                    flag = 5;
-                }
-                else {
-                    if ( entry_temp.orientation.length() > 1 ) {
-                        temp2 = entry_temp.orientation[1];
-                        if ( ( temp2 != "N" ) && ( temp2 != "E" ) && ( temp2 != "Z" ) ) {
-                            flag = 5;
-                        }
-                        else {
-                            if ( entry_temp.orientation.length() > 2 ) {
-                                temp3 = entry_temp.orientation[2];
-                                if ( ( temp3 != "N" ) && ( temp3 != "E" ) && ( temp3 != "Z" ) ) {
-                                    flag = 5;
-                                } 
-                            }
-                        }
-                    }
-                }
-            }
-            else {
-                if ( entry_temp.orientation.length() > 1 ) {
-                    temp2 = entry_temp.orientation[1];
-                    if ( ( temp2 != "1" ) && ( temp2 != "2" ) && ( temp2 != "3" ) ) {
-                        flag = 5;
-                    }
-                    else {
-                        if ( entry_temp.orientation.length() > 2 ) {
-                            temp3 = entry_temp.orientation[2];
-                            if ( ( temp3 != "1" ) && ( temp3 != "2" ) && ( temp3 != "3" ) ) {
-                                flag = 5;
-                            } 
-                        }
-                    }
-                }
-            }
-        }            
-            
-       if ( flag == 5 ) {
-            print_file ( "Entry # ", logfile );
-            print_file ( num_of_input, logfile );
-            print_file ( " ignored. Invalid orientation. ", logfile ); 
-            print_file ( "\n", logfile );  
-        }
-        if ( flag == 0 ) {   
-            num_of_valid_entries = num_of_valid_entries + 1;
-            entry_temp.orientation = temp1;
-            entry_array [ num_of_signal ] = entry_temp;
-            num_of_signal = num_of_signal + 1;
-            if ( temp2 != "" ) {
-                entry_temp.orientation = temp2;
-                entry_array [ num_of_signal ] = entry_temp;
-                num_of_signal = num_of_signal +1;
-                if ( temp3 != "" ) {
-                    entry_temp.orientation = temp3;
-                    entry_array [ num_of_signal ] = entry_temp;
-                    num_of_signal = num_of_signal +1;
-                }
-            }
-        }            
+        inputfile >> temp_orientation;
+        set_orientation ( num_of_input, flag, temp_orientation, entry_temp, entry_array [ num_of_signal ], logfile );
+        temp_orientation = get_orientation ();                
     }
 
     print_file ( "Total invalid entries ignored: ", logfile );
@@ -634,4 +563,88 @@ void set_type_of_instrument (  int num_of_input, string temp_type_of_instrument,
         
 string get_type_of_instrument () {
     return  entry_temp.type_of_instrument;
+}
+
+// Function set_orientation
+        
+void set_orientation (  int num_of_input, int flag, string temp_orientation, station & entry_temp, station & entry_array , ofstream & logfile) {               
+    string temp1 = "";
+    string temp2 = "";
+    string temp3 = "";              
+                
+    if ( ( temp_orientation.length() < 1 ) ||  ( temp_orientation.length() > 3 ) ) {
+        flag = 5;
+    }
+    else {
+        temp1 = temp_orientation[0];
+        if ( ( temp1 != "1" ) && ( temp1 != "2" ) && ( temp1 != "3" ) ) {
+            if ( ( uppercase ( temp1 ) != uppercase ( "N" ) ) && ( uppercase ( temp1 ) != uppercase ( "E" ) ) 
+            && ( uppercase ( temp1 ) != uppercase ( "Z" ) ) ) { 
+                flag = 5;
+            }
+            else {
+                if ( temp_orientation.length() > 1 ) {
+                    temp2 = temp_orientation[1];
+                    if ( ( temp2 != "N" ) && ( temp2 != "E" ) && ( temp2 != "Z" ) ) {
+                        flag = 5;
+                    }
+                    else {
+                        if ( temp_orientation.length() > 2 ) {
+                            temp3 = temp_orientation[2];
+                            if ( ( temp3 != "N" ) && ( temp3 != "E" ) && ( temp3 != "Z" ) ) {
+                                flag = 5;
+                            } 
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            if ( temp_orientation.length() > 1 ) {
+                temp2 = temp_orientation[1];
+                if ( ( temp2 != "1" ) && ( temp2 != "2" ) && ( temp2 != "3" ) ) {
+                    flag = 5;
+                }
+                else {
+                    if ( temp_orientation.length() > 2 ) {
+                        temp3 = temp_orientation[2];
+                        if ( ( temp3 != "1" ) && ( temp3 != "2" ) && ( temp3 != "3" ) ) {
+                            flag = 5;
+                        } 
+                    }
+                }
+            }
+        }
+    }                     
+    if ( flag == 5 ) {
+        print_file ( "Entry # ", logfile );
+        print_file ( num_of_input, logfile );
+        print_file ( " ignored. Invalid orientation. ", logfile ); 
+        print_file ( "\n", logfile );  
+    }
+    if ( flag == 0 ) {   
+        num_of_valid_entries = num_of_valid_entries + 1;
+        entry_temp.orientation = temp1;
+        entry_array = entry_temp;
+        num_of_signal = num_of_signal + 1;
+        if ( temp2 != "" ) {
+            entry_temp.orientation = temp2;
+            entry_array = entry_temp;
+            num_of_signal = num_of_signal +1;
+            if ( temp3 != "" ) {
+                entry_temp.orientation = temp3;
+                entry_array = entry_temp;
+                num_of_signal = num_of_signal +1;
+            }
+        }
+    }            
+
+    entry_temp.orientation = temp_orientation;
+    return;
+}
+        
+// Function get_orientation
+        
+string get_orientation () {
+    return  entry_temp.orientation;
 }               
