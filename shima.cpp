@@ -23,6 +23,7 @@ using namespace std;
 // Defined Libraries
 
 #include "earthquake.h"
+#include "station.h"
 #include "print.h"
 
 // Global Variables
@@ -31,16 +32,6 @@ string inputfilename, outputfilename = "shima.out", logfilename = "shima.log";
 int flag, num_of_valid_entries = 0, num_of_input = 0, num_of_signal = 0;
 string mymessage;
 
-// Defining Struct
-
-struct station {
-    string network_code;
-    string station_code;
-    string type_of_band;
-    string type_of_instrument;
-    string orientation;
-};    
-    
 // Defining Enumerators
 
 enum magnitude_type {
@@ -58,9 +49,20 @@ enum band_type {
 enum instrument_type {
     highgain, lowgain, accelerometer
 };
-     
-station entry_array [ 300 ];
+
+// Defining Struct
+
+struct entry {
+    string network_code;
+    string station_code;
+    string type_of_band;
+    string type_of_instrument;
+    string orientation;
+};
+    
+entry entry_array [ 300 ];
 station entry_temp;
+earthquake header;
 
 // ********************************************************************************************************************
 
@@ -69,10 +71,6 @@ station entry_temp;
 void open_input ( ifstream & );
 void open_file ( string, ofstream & );
 void produce_signal ( ofstream &, string, string, string, string, string, string );
-void check_network_code ( int, string, ofstream & );
-void check_station_code ( int, string, ofstream & );
-void check_type_of_band ( int, string , ofstream & );
-void check_type_of_instrument ( int, string, ofstream & );
 string magnitude_type_to_string ( magnitude_type );
 magnitude_type string_to_magnitude_type ( string );
 string network_code_to_string ( network_code );
@@ -82,20 +80,6 @@ band_type string_to_band_type ( string );
 string instrument_type_to_string ( instrument_type );
 instrument_type string_to_instrument_type ( string );
 
-
-// Set and Get Functions
-
-void set_network_code ( int, string, station &, ofstream & );
-string get_network_code ();
-void set_station_code ( int, string, station &, ofstream & );
-string get_station_code ();
-void set_type_of_band ( int, string, station &, ofstream & );
-string get_type_of_band ();
-void set_type_of_instrument ( int, string, station &, ofstream & );
-string get_type_of_instrument ();
-void set_orientation ( int, int, string, station &, station &, ofstream & );
-string get_orientation ();
-
 // ********************************************************************************************************************
 
 // Main Program.
@@ -103,9 +87,7 @@ string get_orientation ();
 
 int main () {
 
-    // Defining Variables' Type
-    
-    earthquake header;
+    // Defining Variables' Type    
     
     string Event_ID, date, time, time_zone, earthquake_name, latitude, longitude, depth, magnitude_type_string;
     string earthquake_name_continue, day, month, year;
@@ -185,20 +167,20 @@ int main () {
         
         // Checking Using Set and Get Functions for Station
             
-        set_network_code ( num_of_input, temp_network_code, entry_temp, logfile );
-        temp_network_code = get_network_code ();
+        entry_temp.set_network_code ( num_of_input, temp_network_code, logfile );
+        temp_network_code = entry_temp.get_network_code ();
         inputfile >> temp_station_code;
-        set_station_code ( num_of_input, temp_station_code, entry_temp, logfile );
-        temp_station_code = get_station_code ();              
+        entry_temp.set_station_code ( num_of_input, temp_station_code, logfile );
+        temp_station_code = entry_temp.get_station_code ();              
         inputfile >> temp_type_of_band;
-        set_type_of_band ( num_of_input, temp_type_of_band, entry_temp, logfile );
-        temp_type_of_band = get_type_of_band ();
+        entry_temp.set_type_of_band ( num_of_input, temp_type_of_band, logfile );
+        temp_type_of_band = entry_temp.get_type_of_band ();
         inputfile >> temp_type_of_instrument;        
-        set_type_of_instrument ( num_of_input, temp_type_of_instrument, entry_temp, logfile );
-        temp_type_of_instrument = get_type_of_instrument ();
+        entry_temp.set_type_of_instrument ( num_of_input, temp_type_of_instrument, logfile );
+        temp_type_of_instrument = entry_temp.get_type_of_instrument ();
         inputfile >> temp_orientation;
-        set_orientation ( num_of_input, flag, temp_orientation, entry_temp, entry_array [ num_of_signal ], logfile );
-        temp_orientation = get_orientation ();                
+        entry_array [ num_of_signal ] = entry_temp.set_orientation ( num_of_input, flag, temp_orientation, entry_temp, , logfile );
+        temp_orientation = entry_temp.get_orientation ();                
     }
 
     print_file ( "Total invalid entries ignored: ", logfile );
@@ -272,103 +254,7 @@ void open_file ( string filename, ofstream & ofs ) {
         exit (EXIT_FAILURE);
     }
     return;
-} 
-
-// Function to Produce Signal Name as an String
-        
-void produce_signal ( ofstream & outputfile, string Event_ID, string network_code, string station_code, 
-string type_of_band, string type_of_instrument, string orientation ) { 
-    string temp= "";
-    temp.append( Event_ID );
-    temp.append( "." );
-    temp.append( network_code );
-    temp.append( "." );
-    temp.append( station_code );
-    temp.append( "." );
-    temp.append( type_of_band );
-    temp.append( type_of_instrument );
-    temp.append( orientation );
-    outputfile << temp << endl;
-    return;
-}       
-
-// Function to Check Network Code
-
-void check_network_code ( int num_of_input, string code, ofstream & logfile ) {
-    if ( ( code.length() != 2 ) || ( ( code != "CE" ) && ( code != "CI" ) && ( code != "FA" ) 
-    && ( code != "NP" ) && ( code != "WR" ) ) ) {
-        flag = 1;
-    }
-    if ( flag == 1) {
-        print_file ( "Entry # ", logfile );
-        print_file ( num_of_input, logfile );
-        print_file ( " ignored. Invalid network. ", logfile );
-        print_file ( "\n", logfile );
-    }
-    return;
-}
-
-// Function to Check Station Code
-
-void check_station_code ( int num_of_input, string code, ofstream & logfile ) {
-    if ( code.length() != 3 ) {
-        if ( code.length() != 5 ) {
-            flag = 2;
-        }
-        else {
-            if ( ( !isdigit ( code[0] ) ) || ( !isdigit ( code[1] ) ) || ( !isdigit ( code[2] ) ) 
-            || ( !isdigit ( code[3] ) ) || ( !isdigit ( code[4] ) ) ) {
-                flag = 2;
-            }    
-        }
-    }
-    else {
-        if ( ( !isalpha ( code[0] ) ) || ( !isalpha ( code[1] ) ) || ( !isalpha ( code[2] ) ) ) {
-            flag = 2;
-        }
-        else {
-            if ( uppercase ( code ) != code ) {
-                flag = 2;
-            }    
-        }
-    }
-    if ( flag == 2) {
-        print_file ( "Entry # ", logfile );
-        print_file ( num_of_input, logfile );
-        print_file ( " ignored. Invalid station code. ", logfile ); 
-        print_file ( "\n", logfile );
-    }
-    return;
-}            
-    
-// Function to Check Type of Band
-
-void check_type_of_band ( int num_of_input, string band, ofstream & logfile ) {
-    if ( ( uppercase ( band ) != uppercase ( "Long-period" ) ) && ( uppercase ( band ) != uppercase ( "Short-period" ) ) 
-    && ( uppercase ( band ) != uppercase ( "Broadband" ) ) ) {
-        flag = 3;
-    }
-    if ( flag == 3 ) {
-        print_file ( "Entry # ", logfile );
-        print_file ( num_of_input, logfile );
-        print_file ( " ignored. Invalid type of band. ", logfile ); 
-        print_file ( "\n", logfile );
-    }
-    return;
-}    
-       
-void check_type_of_instrument ( int num_of_input, string instrument, ofstream & logfile ) {        
-    if ( ( uppercase ( instrument ) != uppercase ( "High-Gain" ) ) && ( uppercase ( instrument ) != uppercase ( "Low-Gain" ) ) 
-    && ( uppercase ( instrument ) != uppercase ( "Accelerometer" ) ) ) {
-        flag = 4;
-    }
-    if ( flag == 4 ) {
-        print_file ( "Entry # ", logfile );
-        print_file ( num_of_input, logfile );
-        print_file ( " ignored. Invalid type of instrument. ", logfile ); 
-        print_file ( "\n", logfile );
-    }
-} 
+}  
    
 // Function to Change Magnitude Type to String
 
@@ -504,147 +390,3 @@ instrument_type string_to_instrument_type (string NN) {
     }
     exit(EXIT_FAILURE);
 }
-
-// ***********************************************************************************
-
-// Set and Get Functions For Station Struct
-
-// Function set_network_code
-        
-void set_network_code (  int num_of_input, string temp_network_code, station & entry_temp, ofstream & logfile) {
-    check_network_code ( num_of_input, temp_network_code, logfile );
-    entry_temp.network_code = temp_network_code;
-    return;
-}
-        
-// Function get_network_code
-        
-string get_network_code () {
-    return  entry_temp.network_code;
-}
-                
-// Function set_station_code
-        
-void set_station_code (  int num_of_input, string temp_station_code, station & entry_temp, ofstream & logfile) {               
-    check_station_code ( num_of_input, temp_station_code, logfile );
-    entry_temp.station_code = temp_station_code;
-    return;
-}
-        
-// Function get_station_code
-        
-string get_station_code () {
-    return  entry_temp.station_code;
-}
-
-// Function set_type_of_band
-        
-void set_type_of_band (  int num_of_input, string temp_type_of_band, station & entry_temp, ofstream & logfile) {               
-    check_type_of_band ( num_of_input, temp_type_of_band, logfile );
-    entry_temp.type_of_band = temp_type_of_band;
-    return;
-}
-        
-// Function get_type_of_band
-        
-string get_type_of_band () {
-    return  entry_temp.type_of_band;
-}
-        
-// Function set_type_of_instrument
-        
-void set_type_of_instrument (  int num_of_input, string temp_type_of_instrument, station & entry_temp, ofstream & logfile) {               
-    check_type_of_instrument ( num_of_input, temp_type_of_instrument, logfile );
-    entry_temp.type_of_instrument = temp_type_of_instrument;
-    return;
-}
-        
-// Function get_type_of_instrument
-        
-string get_type_of_instrument () {
-    return  entry_temp.type_of_instrument;
-}
-
-// Function set_orientation
-        
-void set_orientation (  int num_of_input, int flag, string temp_orientation, station & entry_temp, station & entry_array , ofstream & logfile) {               
-    string temp1 = "";
-    string temp2 = "";
-    string temp3 = "";              
-                
-    if ( ( temp_orientation.length() < 1 ) ||  ( temp_orientation.length() > 3 ) ) {
-        flag = 5;
-    }
-    else {
-        temp1 = temp_orientation[0];
-        if ( ( temp1 != "1" ) && ( temp1 != "2" ) && ( temp1 != "3" ) ) {
-            if ( ( uppercase ( temp1 ) != uppercase ( "N" ) ) && ( uppercase ( temp1 ) != uppercase ( "E" ) ) 
-            && ( uppercase ( temp1 ) != uppercase ( "Z" ) ) ) { 
-                flag = 5;
-            }
-            else {
-                if ( temp_orientation.length() > 1 ) {
-                    temp2 = temp_orientation[1];
-                    if ( ( temp2 != "N" ) && ( temp2 != "E" ) && ( temp2 != "Z" ) ) {
-                        flag = 5;
-                    }
-                    else {
-                        if ( temp_orientation.length() > 2 ) {
-                            temp3 = temp_orientation[2];
-                            if ( ( temp3 != "N" ) && ( temp3 != "E" ) && ( temp3 != "Z" ) ) {
-                                flag = 5;
-                            } 
-                        }
-                    }
-                }
-            }
-        }
-        else {
-            if ( temp_orientation.length() > 1 ) {
-                temp2 = temp_orientation[1];
-                if ( ( temp2 != "1" ) && ( temp2 != "2" ) && ( temp2 != "3" ) ) {
-                    flag = 5;
-                }
-                else {
-                    if ( temp_orientation.length() > 2 ) {
-                        temp3 = temp_orientation[2];
-                        if ( ( temp3 != "1" ) && ( temp3 != "2" ) && ( temp3 != "3" ) ) {
-                            flag = 5;
-                        } 
-                    }
-                }
-            }
-        }
-    }                     
-    if ( flag == 5 ) {
-        print_file ( "Entry # ", logfile );
-        print_file ( num_of_input, logfile );
-        print_file ( " ignored. Invalid orientation. ", logfile ); 
-        print_file ( "\n", logfile );  
-    }
-    if ( flag == 0 ) {   
-        num_of_valid_entries = num_of_valid_entries + 1;
-        entry_temp.orientation = temp1;
-        entry_array = entry_temp;
-        num_of_signal = num_of_signal + 1;
-        if ( temp2 != "" ) {
-            entry_temp.orientation = temp2;
-            entry_array = entry_temp;
-            num_of_signal = num_of_signal +1;
-            if ( temp3 != "" ) {
-                entry_temp.orientation = temp3;
-                entry_array = entry_temp;
-                num_of_signal = num_of_signal +1;
-            }
-        }
-    }            
-
-    entry_temp.orientation = temp_orientation;
-    return;
-}
-        
-// Function get_orientation
-        
-string get_orientation () {
-    return  entry_temp.orientation;
-}               
