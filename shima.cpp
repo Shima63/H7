@@ -29,8 +29,8 @@ using namespace std;
 // Global Variables
 
 string inputfilename, outputfilename = "shima.out", logfilename = "shima.log";
-string mymessage;
-int num_of_input_main;
+int flag, num_of_valid_entries = 0, num_of_input = 0, num_of_signal = 0;
+string mymessage, temp1, temp2, temp3;
 
 // Defining Enumerators
 
@@ -48,6 +48,16 @@ enum band_type {
 
 enum instrument_type {
     highgain, lowgain, accelerometer
+};
+
+// Defining Struct
+
+struct myentry {
+    string network_code;
+    string station_code;
+    string type_of_band;
+    string type_of_instrument;
+    string orientation;
 };
   
 myentry entry_array [ 300 ];
@@ -153,27 +163,65 @@ int main () {
 
     while ( ( inputfile >> temp_network_code ) && ( num_of_valid_entries < 300 ) ) {
         flag = 0;
-        num_of_input_main = num_of_input_main + 1;
+        num_of_input = num_of_input + 1;
         
         // Checking Using Set and Get Functions for Station
             
-        entry_temp.set_network_code ( num_of_input_main, temp_network_code, logfile );
+        entry_temp.set_network_code ( num_of_input, temp_network_code, logfile, flag );
         temp_network_code = entry_temp.get_network_code ();
         inputfile >> temp_station_code;
-        entry_temp.set_station_code ( num_of_input_main, temp_station_code, logfile );
+        entry_temp.set_station_code ( num_of_input, temp_station_code, logfile, flag );
         temp_station_code = entry_temp.get_station_code ();              
         inputfile >> temp_type_of_band;
-        entry_temp.set_type_of_band ( num_of_input_main, temp_type_of_band, logfile );
+        entry_temp.set_type_of_band ( num_of_input, temp_type_of_band, logfile, flag );
         temp_type_of_band = entry_temp.get_type_of_band ();
         inputfile >> temp_type_of_instrument;        
-        entry_temp.set_type_of_instrument ( num_of_input_main, temp_type_of_instrument, logfile );
+        entry_temp.set_type_of_instrument ( num_of_input, temp_type_of_instrument, logfile, flag );
         temp_type_of_instrument = entry_temp.get_type_of_instrument ();
         inputfile >> temp_orientation;
-        entry_temp.set_orientation ( num_of_input_main, temp_orientation, logfile, entry_array );
-        temp_orientation = entry_temp.get_orientation ();                
+        entry_temp.set_orientation ( num_of_input, temp_orientation, logfile, temp1, temp2, temp3, flag );
+        temp_orientation = entry_temp.get_orientation (); // Probably we wil not need that!
+        
+        if ( flag == 0 ) {
+            num_of_valid_entries = num_of_valid_entries + 1;
+            entry_array [ num_of_signal ].network_code = temp_network_code;
+            entry_array [ num_of_signal ].station_code = temp_station_code;
+            entry_array [ num_of_signal ].type_of_band = temp_type_of_band;
+            entry_array [ num_of_signal ].type_of_instrument = temp_type_of_instrument;
+            entry_array [ num_of_signal ].orientation = temp1;
+            num_of_signal = num_of_signal + 1;
+            if ( temp2 != "" ) {
+                num_of_valid_entries = num_of_valid_entries + 1;
+                entry_array [ num_of_signal ].network_code = temp_network_code;
+                entry_array [ num_of_signal ].station_code = temp_station_code;
+                entry_array [ num_of_signal ].type_of_band = temp_type_of_band;
+                entry_array [ num_of_signal ].type_of_instrument = temp_type_of_instrument;
+                entry_array [ num_of_signal ].orientation = temp2;
+                num_of_signal = num_of_signal +1;
+                if ( temp3 != "" ) {
+                    num_of_valid_entries = num_of_valid_entries + 1;
+                    entry_array [ num_of_signal ].network_code = temp_network_code;
+                    entry_array [ num_of_signal ].station_code = temp_station_code;
+                    entry_array [ num_of_signal ].type_of_band = temp_type_of_band;
+                    entry_array [ num_of_signal ].type_of_instrument = temp_type_of_instrument;
+                    entry_array [ num_of_signal ].orientation = temp3;
+                    num_of_signal = num_of_signal +1;
+                }
+            }
+        }
+            
     }
 
-    entry_temp.make_Print ( logfile, num_of_input_main );
+    print_file ( "Total invalid entries ignored: ", logfile );
+    print_file ( ( num_of_input - num_of_valid_entries ), logfile );
+    print_file ( "\n", logfile );
+    print_file ( "Total valid entries read: ", logfile );
+    print_file ( num_of_valid_entries, logfile );
+    print_file ( "\n", logfile );
+    print_file ( "Total signal names produced: ", logfile );
+    print_file ( num_of_signal, logfile );
+    print_file ( "\n", logfile );
+    print_file ( "Finished!", logfile );
  
     // Printing Outputs
     
@@ -182,9 +230,7 @@ int main () {
         
         // Producing Signal
         
-        produce_signal ( outputfile, header.get_Event_ID (), network_code_to_string ( string_to_network_code ( entry_array[i].network_code ) ), 
-        entry_array[i].station_code, band_type_to_string ( string_to_band_type ( entry_array[i].type_of_band ) ), 
-        instrument_type_to_string ( string_to_instrument_type ( entry_array[i].type_of_instrument ) ), entry_array[i].orientation );    
+        produce_signal ( outputfile, header.get_Event_ID (), network_code_to_string ( string_to_network_code ( entry_array[i].network_code ) ), entry_array[i].station_code, band_type_to_string ( string_to_band_type ( entry_array[i].type_of_band ) ), instrument_type_to_string ( string_to_instrument_type ( entry_array[i].type_of_instrument ) ), entry_array[i].orientation );
     }
     
     return 0;
@@ -373,9 +419,9 @@ instrument_type string_to_instrument_type (string NN) {
 }
 
 // Function to Produce Signal Name as an String
-        
-void produce_signal ( ofstream & outputfile, string Event_ID, string network_code, string station_code, 
-string type_of_band, string type_of_instrument, string orientation ) { 
+
+void produce_signal ( ofstream & outputfile, string Event_ID, string network_code, string station_code,
+                     string type_of_band, string type_of_instrument, string orientation ) {
     string temp= "";
     temp.append( Event_ID );
     temp.append( "." );
@@ -388,4 +434,4 @@ string type_of_band, string type_of_instrument, string orientation ) {
     temp.append( orientation );
     outputfile << temp << endl;
     return;
-}  
+}
