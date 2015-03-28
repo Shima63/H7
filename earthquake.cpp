@@ -1,6 +1,7 @@
 // This Is Earthquake Class Containing Header Parts
 
 #include <iostream>
+#include <stdlib.h>
 #include "earthquake.h"
 #include "print.h"
 using namespace std;
