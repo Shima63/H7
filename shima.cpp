@@ -167,20 +167,22 @@ int main () {
         
         // Checking Using Set and Get Functions for Station
             
-        entry_temp.set_network_code ( num_of_input, temp_network_code, logfile, flag );
+        flag = entry_temp.set_network_code ( num_of_input, temp_network_code, logfile, flag );
         temp_network_code = entry_temp.get_network_code ();
         inputfile >> temp_station_code;
-        entry_temp.set_station_code ( num_of_input, temp_station_code, logfile, flag );
+        flag = entry_temp.set_station_code ( num_of_input, temp_station_code, logfile, flag );
         temp_station_code = entry_temp.get_station_code ();              
         inputfile >> temp_type_of_band;
-        entry_temp.set_type_of_band ( num_of_input, temp_type_of_band, logfile, flag );
+        flag = entry_temp.set_type_of_band ( num_of_input, temp_type_of_band, logfile, flag );
         temp_type_of_band = entry_temp.get_type_of_band ();
         inputfile >> temp_type_of_instrument;        
-        entry_temp.set_type_of_instrument ( num_of_input, temp_type_of_instrument, logfile, flag );
+        flag = entry_temp.set_type_of_instrument ( num_of_input, temp_type_of_instrument, logfile, flag );
         temp_type_of_instrument = entry_temp.get_type_of_instrument ();
         inputfile >> temp_orientation;
-        entry_temp.set_orientation ( num_of_input, temp_orientation, logfile, temp1, temp2, temp3, flag );
+        flag = entry_temp.set_orientation ( num_of_input, temp_orientation, logfile, temp1, temp2, temp3, flag );
         temp_orientation = entry_temp.get_orientation (); // Probably we wil not need that!
+        
+        //cout << "num" << num_of_input << "flag=" << flag<< endl;
         
         if ( flag == 0 ) {
             num_of_valid_entries = num_of_valid_entries + 1;

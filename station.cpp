@@ -7,10 +7,10 @@ using namespace std;
 
 // Function set_network_code
         
-void station :: set_network_code (  int num_of_input, string temp_network_code, ofstream & logfile, int flag) {
-    check_network_code ( num_of_input, temp_network_code, logfile, flag );
+int station :: set_network_code (  int num_of_input, string temp_network_code, ofstream & logfile, int flag) {
+    flag = check_network_code ( num_of_input, temp_network_code, logfile, flag );
     network_code = temp_network_code;
-    return;
+    return flag;
 }
         
 // Function get_network_code
@@ -21,10 +21,10 @@ string station :: get_network_code () {
                 
 // Function set_station_code
         
-void station :: set_station_code (  int num_of_input, string temp_station_code, ofstream & logfile, int flag ) {
-    check_station_code ( num_of_input, temp_station_code, logfile, flag );
+int station :: set_station_code (  int num_of_input, string temp_station_code, ofstream & logfile, int flag ) {
+    flag = check_station_code ( num_of_input, temp_station_code, logfile, flag );
     station_code = temp_station_code;
-    return;
+    return flag;
 }
         
 // Function get_station_code
@@ -35,10 +35,10 @@ string station :: get_station_code () {
 
 // Function set_type_of_band
         
-void station :: set_type_of_band (  int num_of_input, string temp_type_of_band, ofstream & logfile, int flag ) {
-    check_type_of_band ( num_of_input, temp_type_of_band, logfile, flag );
+int station :: set_type_of_band (  int num_of_input, string temp_type_of_band, ofstream & logfile, int flag ) {
+    flag = check_type_of_band ( num_of_input, temp_type_of_band, logfile, flag );
     type_of_band = temp_type_of_band;
-    return;
+    return flag;
 }
         
 // Function get_type_of_band
@@ -49,10 +49,10 @@ string station :: get_type_of_band () {
         
 // Function set_type_of_instrument
         
-void station :: set_type_of_instrument (  int num_of_input, string temp_type_of_instrument, ofstream & logfile, int flag ) {
-    check_type_of_instrument ( num_of_input, temp_type_of_instrument, logfile, flag );
+int station :: set_type_of_instrument (  int num_of_input, string temp_type_of_instrument, ofstream & logfile, int flag ) {
+    flag = check_type_of_instrument ( num_of_input, temp_type_of_instrument, logfile, flag );
     type_of_instrument = temp_type_of_instrument;
-    return;
+    return flag;
 }
         
 // Function get_type_of_instrument
@@ -63,7 +63,7 @@ string station :: get_type_of_instrument () {
 
 // Function set_orientation
         
-void station :: set_orientation (  int num_of_input, string temp_orientation, ofstream & logfile, string temp1, string temp2, string temp3, int flag ) {
+int station :: set_orientation (  int num_of_input, string temp_orientation, ofstream & logfile, string temp1, string temp2, string temp3, int flag ) {
     temp1 = "";
     temp2 = "";
     temp3 = "";              
@@ -119,7 +119,7 @@ void station :: set_orientation (  int num_of_input, string temp_orientation, of
         print_file ( "\n", logfile );  
     }
   
-    return;
+    return flag;
 }
         
 // Function get_orientation
@@ -132,7 +132,7 @@ string station :: get_orientation () {
 
 // Function to Check Network Code
 
-void station :: check_network_code ( int num_of_input, string code, ofstream & logfile, int flag ) {
+int station :: check_network_code ( int num_of_input, string code, ofstream & logfile, int flag ) {
     if ( ( code.length() != 2 ) || ( ( code != "CE" ) && ( code != "CI" ) && ( code != "FA" ) 
     && ( code != "NP" ) && ( code != "WR" ) ) ) {
         flag = 1;
@@ -143,12 +143,12 @@ void station :: check_network_code ( int num_of_input, string code, ofstream & l
         print_file ( " ignored. Invalid network. ", logfile );
         print_file ( "\n", logfile );
     }
-    return;
+    return flag;
 }
 
 // Function to Check Station Code
 
-void station :: check_station_code ( int num_of_input, string code, ofstream & logfile, int flag ) {
+int station :: check_station_code ( int num_of_input, string code, ofstream & logfile, int flag ) {
     if ( code.length() != 3 ) {
         if ( code.length() != 5 ) {
             flag = 2;
@@ -176,12 +176,12 @@ void station :: check_station_code ( int num_of_input, string code, ofstream & l
         print_file ( " ignored. Invalid station code. ", logfile ); 
         print_file ( "\n", logfile );
     }
-    return;
+    return flag;
 }            
     
 // Function to Check Type of Band
 
-void station :: check_type_of_band ( int num_of_input, string band, ofstream & logfile, int flag ) {
+int station :: check_type_of_band ( int num_of_input, string band, ofstream & logfile, int flag ) {
     if ( ( uppercase ( band ) != uppercase ( "Long-period" ) ) && ( uppercase ( band ) != uppercase ( "Short-period" ) ) 
     && ( uppercase ( band ) != uppercase ( "Broadband" ) ) ) {
         flag = 3;
@@ -192,10 +192,10 @@ void station :: check_type_of_band ( int num_of_input, string band, ofstream & l
         print_file ( " ignored. Invalid type of band. ", logfile ); 
         print_file ( "\n", logfile );
     }
-    return;
+    return flag;
 }    
        
-void station :: check_type_of_instrument ( int num_of_input, string instrument, ofstream & logfile, int flag ) {
+int station :: check_type_of_instrument ( int num_of_input, string instrument, ofstream & logfile, int flag ) {
     if ( ( uppercase ( instrument ) != uppercase ( "High-Gain" ) ) && ( uppercase ( instrument ) != uppercase ( "Low-Gain" ) ) 
     && ( uppercase ( instrument ) != uppercase ( "Accelerometer" ) ) ) {
         flag = 4;
@@ -206,4 +206,5 @@ void station :: check_type_of_instrument ( int num_of_input, string instrument, 
         print_file ( " ignored. Invalid type of instrument. ", logfile ); 
         print_file ( "\n", logfile );
     }
+    return flag;
 }
