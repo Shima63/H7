@@ -1,3 +1,5 @@
+// This Is Earthquake Class Containing Header Parts
+
 #include <iostream>
 #include "earthquake.h"
 #include "print.h"
@@ -27,26 +29,28 @@ string earthquake :: set_date ( string s, ofstream & logfile ) {
     date = s;
     check_date ( date, logfile );
     
-    // Finding and Checking  Validity of the Month
+    // Finding and Checking Validity of the Month
     
     tempa =  tempa.append ( date.begin (), date.begin () + 2 );
-    value = atoi(tempa.c_str());
+    value = atoi( tempa.c_str () );
     check_month ( value, logfile );
     month_name = months(value);
     month = monthstring ( month_name );
     
-    // Finding and Checking  Validity of the day
+    // Finding and Checking Validity of the day
     
-    tempb =  tempb.append ( date.begin () + 4, date.begin () + 5 );
-    value = atoi(tempb.c_str());
+    tempb =  tempb.append ( date.begin () + 3, date.begin () + 5 );
+    value = atoi( tempb.c_str () );
     check_day ( value, logfile );
     
-    // Finding and Checking  Validity of the year
+    // Finding and Checking Validity of the year
     
     tempc =  tempc.append ( date.begin () + 6, date.end () );
-    value = atoi(tempc.c_str());
+    value = atoi( tempc.c_str () );
     check_year ( value, logfile );
     
+    // Returning Month
+
     return month;
 }
 
@@ -132,7 +136,7 @@ float earthquake :: get_magnitude_size () {
 
 // Other Functions
 
-// This "check_date" function checks the validity of date entry.
+// This "check_date" Function Checks the Validity of Date Entry.
 
 void earthquake :: check_date ( string date, ofstream & logfile ) {
     message = "Date format is not right.";
@@ -159,7 +163,7 @@ void earthquake :: check_date ( string date, ofstream & logfile ) {
     return;
 }    
 
-// This "check_month" function checks the validity of month entry.
+// This "check_month" Function Checks the Validity of Month Entry.
 
 void earthquake :: check_month ( int month, ofstream & logfile ) {
     if ( ( month > 12 ) || ( month < 1 ) ) {
@@ -170,7 +174,7 @@ void earthquake :: check_month ( int month, ofstream & logfile ) {
     return;
 }
 
-// This "check_day" function checks the validity of day entry.
+// This "check_day" Function Checks the Validity of Day Entry.
 
 void earthquake :: check_day ( int day, ofstream & logfile ) {
     if ( ( day > 31 ) || ( day < 1 ) ) {
@@ -181,7 +185,7 @@ void earthquake :: check_day ( int day, ofstream & logfile ) {
     return;
 }
 
-// This "check_year" function checks the validity of year entry.
+// This "check_year" Function Checks the Validity of Year Entry.
 
 void earthquake :: check_year ( int year, ofstream & logfile ) {
     if ( year < 0 ) {
@@ -192,7 +196,7 @@ void earthquake :: check_year ( int year, ofstream & logfile ) {
     return;
 }
 
-// This "check_time" function checks the validity of time entry.
+// This "check_time" Function Checks the Validity of Time Entry.
 
 void earthquake :: check_time ( string time, ofstream & logfile ) {
     message = "Time format is not right.";
@@ -206,56 +210,56 @@ void earthquake :: check_time ( string time, ofstream & logfile ) {
             exit (EXIT_FAILURE);
         }
         else {
-        if ( ( !isdigit ( time[0] ) ) || ( !isdigit ( time[1] ) ) || ( !isdigit ( time[3] ) ) || ( !isdigit ( time[4] ) ) ) {
-            print_file ( message, logfile );
-            exit (EXIT_FAILURE);
-        }  
-        if ( ( !isdigit ( time[6] ) ) || ( !isdigit ( time[7] ) ) || ( !isdigit ( time[9] ) ) 
-        || ( !isdigit ( time[10] ) ) || ( !isdigit ( time[11] ) ) ) {
-            print_file ( message, logfile );
-            exit (EXIT_FAILURE);
-        }
+            if ( ( !isdigit ( time[0] ) ) || ( !isdigit ( time[1] ) ) || ( !isdigit ( time[3] ) ) || ( !isdigit ( time[4] ) ) ) {
+                print_file ( message, logfile );
+                exit (EXIT_FAILURE);
+            }  
+            if ( ( !isdigit ( time[6] ) ) || ( !isdigit ( time[7] ) ) || ( !isdigit ( time[9] ) ) 
+            || ( !isdigit ( time[10] ) ) || ( !isdigit ( time[11] ) ) ) {
+                print_file ( message, logfile );
+                exit (EXIT_FAILURE);
+            }
         
-        // Defining Temporary Variables
+            // Defining Temporary Variables
         
-        string temp0, temp1, temp2;
-        double value;
+            string temp0, temp1, temp2;
+            double value;
         
-        // Finding and Checking  Validity of the Hour
+            // Finding and Checking Validity of the Hour
   
-        temp0 =  temp0.append ( time.begin (), time.begin () + 2 );
-        value = atoi(temp0.c_str());
-        if ( ( value < 0 ) || ( value > 23 ) ) {
-            message = "Hour is not right.";
-            print_file ( message, logfile );
-            exit (EXIT_FAILURE);
-        }
+            temp0 =  temp0.append ( time.begin (), time.begin () + 2 );
+            value = atoi(temp0.c_str());
+            if ( ( value < 0 ) || ( value > 23 ) ) {
+                message = "Hour is not right.";
+                print_file ( message, logfile );
+                exit (EXIT_FAILURE);
+            }
         
-        // Finding and Checking  Validity of the Minute
+            // Finding and Checking Validity of the Minute
   
-        temp1 =  temp1.append ( time.begin () + 3, time.begin () + 5 );
-        value = atoi(temp1.c_str());
-        if ( ( value < 0 ) || ( value > 59 ) ) {
-            message = "Minute is not right.";
-            print_file ( message, logfile );
-            exit (EXIT_FAILURE);
-        }
+            temp1 =  temp1.append ( time.begin () + 3, time.begin () + 5 );
+            value = atoi(temp1.c_str());
+            if ( ( value < 0 ) || ( value > 59 ) ) {
+                message = "Minute is not right.";
+                print_file ( message, logfile );
+                exit (EXIT_FAILURE);
+            }
         
-        // Finding and Checking  Validity of the Second
+            // Finding and Checking Validity of the Second
   
-        temp2 =  temp2.append ( time.begin () + 6, time.begin () + 8 );
-        value = atoi(temp2.c_str());
-        if ( ( value < 0 ) || ( value > 59.999 ) ) {
-            message = "Second is not right.";
-            print_file ( message, logfile );
-            exit (EXIT_FAILURE);
-        }                    
-    }
+            temp2 =  temp2.append ( time.begin () + 6, time.begin () + 8 );
+            value = atoi(temp2.c_str());
+            if ( ( value < 0 ) || ( value > 59.999 ) ) {
+                message = "Second is not right.";
+                print_file ( message, logfile );
+                exit (EXIT_FAILURE);
+            }                    
+        }
     }
     return;
 }    
 
-// This "check_time_zone" function checks the validity of time zone entry.
+// This "check_time_zone" Function Checks the Validity of Time Zone Entry.
 
 void earthquake :: check_time_zone ( string time_zone, ofstream & logfile ) {
     message = "Time_zone format is not right.";
@@ -267,7 +271,7 @@ void earthquake :: check_time_zone ( string time_zone, ofstream & logfile ) {
     return;
 }    
 
-// This "check_magnitude_type" function checks the validity of magnitude type considering it case insensitive.
+// This "check_magnitude_type" Function Checks the Validity of Magnitude Type Considering It Case Insensitive.
 
 void earthquake :: check_magnitude_type ( string magnitude_type, ofstream & logfile ) {
     message = "magnitude_type is not right.";
@@ -279,7 +283,7 @@ void earthquake :: check_magnitude_type ( string magnitude_type, ofstream & logf
     return;
 }
 
-// This "check_magnitude_size" function checks the validity of magnitude size as a positive real number (>0).
+// This "check_magnitude_size" Function Checks the Validity of Magnitude Size as a Positive Real Number ( > 0 ).
 
 void earthquake :: check_magnitude_size ( float magnitude_size, ofstream & logfile ) {
     message = "magnitude_size is not right.";
@@ -322,3 +326,4 @@ string earthquake :: monthstring ( months month ) {
             return "ILLEGAL";
     }
 }
+

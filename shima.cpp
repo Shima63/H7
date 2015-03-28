@@ -182,8 +182,6 @@ int main () {
         flag = entry_temp.set_orientation ( num_of_input, temp_orientation, logfile, temp1, temp2, temp3, flag );
         temp_orientation = entry_temp.get_orientation (); // Probably we wil not need that!
         
-        //cout << "num" << num_of_input << "flag=" << flag<< endl;
-        
         if ( flag == 0 ) {
             num_of_valid_entries = num_of_valid_entries + 1;
             entry_array [ num_of_signal ].network_code = temp_network_code;
@@ -193,7 +191,6 @@ int main () {
             entry_array [ num_of_signal ].orientation = temp1;
             num_of_signal = num_of_signal + 1;
             if ( temp2 != "" ) {
-                num_of_valid_entries = num_of_valid_entries + 1;
                 entry_array [ num_of_signal ].network_code = temp_network_code;
                 entry_array [ num_of_signal ].station_code = temp_station_code;
                 entry_array [ num_of_signal ].type_of_band = temp_type_of_band;
@@ -201,7 +198,6 @@ int main () {
                 entry_array [ num_of_signal ].orientation = temp2;
                 num_of_signal = num_of_signal +1;
                 if ( temp3 != "" ) {
-                    num_of_valid_entries = num_of_valid_entries + 1;
                     entry_array [ num_of_signal ].network_code = temp_network_code;
                     entry_array [ num_of_signal ].station_code = temp_station_code;
                     entry_array [ num_of_signal ].type_of_band = temp_type_of_band;
@@ -210,8 +206,7 @@ int main () {
                     num_of_signal = num_of_signal +1;
                 }
             }
-        }
-            
+        }   
     }
 
     print_file ( "Total invalid entries ignored: ", logfile );
@@ -232,7 +227,11 @@ int main () {
         
         // Producing Signal
         
-        produce_signal ( outputfile, header.get_Event_ID (), network_code_to_string ( string_to_network_code ( entry_array[i].network_code ) ), entry_array[i].station_code, band_type_to_string ( string_to_band_type ( entry_array[i].type_of_band ) ), instrument_type_to_string ( string_to_instrument_type ( entry_array[i].type_of_instrument ) ), entry_array[i].orientation );
+        produce_signal ( outputfile, header.get_Event_ID (), network_code_to_string 
+        ( string_to_network_code ( entry_array[i].network_code ) ), entry_array[i].station_code, 
+        band_type_to_string ( string_to_band_type ( entry_array[i].type_of_band ) ), 
+        instrument_type_to_string ( string_to_instrument_type ( entry_array[i].type_of_instrument ) ), 
+        entry_array[i].orientation );
     }
     
     return 0;

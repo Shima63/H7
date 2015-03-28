@@ -17,14 +17,14 @@ class station {
         string get_type_of_band ();
         int set_type_of_instrument ( int, string, ofstream &, int );
         string get_type_of_instrument ();
-        int set_orientation ( int, string, ofstream &, string, string, string, int );
+        int set_orientation ( int, string, ofstream &, string &, string &, string &, int );
         string get_orientation ();
     
         // Other Functions
 
         int check_network_code ( int, string, ofstream &, int );
         int check_station_code ( int, string, ofstream &, int );
-        int check_type_of_band ( int, string , ofstream &, int );
+        int check_type_of_band ( int, string, ofstream &, int );
         int check_type_of_instrument ( int, string, ofstream &, int );
 
     private:

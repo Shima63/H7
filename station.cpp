@@ -35,7 +35,7 @@ string station :: get_station_code () {
 
 // Function set_type_of_band
         
-int station :: set_type_of_band (  int num_of_input, string temp_type_of_band, ofstream & logfile, int flag ) {
+int station :: set_type_of_band ( int num_of_input, string temp_type_of_band, ofstream & logfile, int flag ) {
     flag = check_type_of_band ( num_of_input, temp_type_of_band, logfile, flag );
     type_of_band = temp_type_of_band;
     return flag;
@@ -49,7 +49,7 @@ string station :: get_type_of_band () {
         
 // Function set_type_of_instrument
         
-int station :: set_type_of_instrument (  int num_of_input, string temp_type_of_instrument, ofstream & logfile, int flag ) {
+int station :: set_type_of_instrument ( int num_of_input, string temp_type_of_instrument, ofstream & logfile, int flag ) {
     flag = check_type_of_instrument ( num_of_input, temp_type_of_instrument, logfile, flag );
     type_of_instrument = temp_type_of_instrument;
     return flag;
@@ -63,11 +63,11 @@ string station :: get_type_of_instrument () {
 
 // Function set_orientation
         
-int station :: set_orientation (  int num_of_input, string temp_orientation, ofstream & logfile, string temp1, string temp2, string temp3, int flag ) {
+int station :: set_orientation ( int num_of_input, string temp_orientation, ofstream & logfile, 
+string & temp1, string & temp2, string & temp3, int flag ) {
     temp1 = "";
     temp2 = "";
     temp3 = "";              
-                
     if ( ( temp_orientation.length() < 1 ) ||  ( temp_orientation.length() > 3 ) ) {
         flag = 5;
     }
@@ -118,7 +118,6 @@ int station :: set_orientation (  int num_of_input, string temp_orientation, ofs
         print_file ( " ignored. Invalid orientation. ", logfile ); 
         print_file ( "\n", logfile );  
     }
-  
     return flag;
 }
         
