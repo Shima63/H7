@@ -60,7 +60,7 @@ struct myentry {
     string orientation;
 };
   
-myentry entry_array [ 300 ];
+myentry entry_array [ 900 ];
 station entry_temp;
 earthquake header;
 
